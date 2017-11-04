@@ -10,6 +10,7 @@ int main()
 	
 	int zahl1, zahl2, zahl3;
 	
+	
 	if(a<b)
 		{
 		zahl1 = a;
