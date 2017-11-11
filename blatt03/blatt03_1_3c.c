@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MOD(a, b) a - ((a / b) * b)
+#define MOD(a, b) (a - ((a / b) * b))
 
 typedef unsigned long int u32;
 
