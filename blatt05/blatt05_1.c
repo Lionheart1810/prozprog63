@@ -2,16 +2,23 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define DEBUG 0
+//////////////////////////
+#define DEBUG
 #define _FOR_WINDOWS
+#define HARDCODE
+//////////////////////////
 
 #define TRUE 1
 #define FALSE 0
 
 #define CHECK_ELEMENT(x, y) if (sudoku[y][x] != 0) { if ((checker >> (sudoku[y][x]-1)) & 1) return FALSE; else checker |= (1 << (sudoku[y][x]-1)); }
 #define SUDOKU_READ(x, y) (sudoku[y][x] & 0xF)
+#define SUDOKU_FLAG_PREDEFINED (1 << 7)
+#define SUDOKU_FLAG_MODIFIED (1 << 6)
+#define SUDOKU_IS_PREDEFINED(x) (x >> 7)
+#define SUDOKU_IS_MODIFIED(x) ((x >> 6) & 1)
 
-#if DEBUG == 1
+#ifdef DEBUG
 #define DLOG(x) printf(x)
 #else
 #define DLOG(x) 
@@ -19,9 +26,17 @@
 
 #ifdef _FOR_LINUX
 #define CONSOLE_CLEAR system("clear")
+#define COLOR_DEFAULT "\x1B[0m"
+#define COLOR_PREDEFINED "\x1B[33m"
+#define COLOR_MODIFIED "\x1B[32m"
+#define COLOR_WRITABLE "\x1B[34m"
 #endif
 #ifdef _FOR_WINDOWS
 #define CONSOLE_CLEAR system("cls")
+#define COLOR_DEFAULT ""
+#define COLOR_PREDEFINED ""
+#define COLOR_MODIFIED ""
+#define COLOR_WRITABLE ""
 #endif
 
 typedef unsigned char u8;
@@ -36,9 +51,29 @@ struct placement
 	struct placement *next;
 };
 
-struct placement *undo_ptr;
-struct placement *redo_ptr;
+struct placement *undo_ptr, *redo_ptr;
 
+void init();
+u8 check(u8 x, u8 y, u8 n);
+void set();
+void undo();
+void redo();
+u8 solve(u8 overwrite);
+u8 check_win();
+u8 interpret(char *seq);
+void reset();
+
+#ifdef HARDCODE
+u8 sudoku[9][9] = { { 4 | SUDOKU_FLAG_PREDEFINED, 1 | SUDOKU_FLAG_PREDEFINED, 0, 0, 6 | SUDOKU_FLAG_PREDEFINED, 5 | SUDOKU_FLAG_PREDEFINED, 0, 0, 7 | SUDOKU_FLAG_PREDEFINED },
+					{ 0, 0, 6 | SUDOKU_FLAG_PREDEFINED, 0, 0, 7 | SUDOKU_FLAG_PREDEFINED, 4 | SUDOKU_FLAG_PREDEFINED, 8 | SUDOKU_FLAG_PREDEFINED, 0 },
+					{ 2 | SUDOKU_FLAG_PREDEFINED, 0, 7 | SUDOKU_FLAG_PREDEFINED, 4 | SUDOKU_FLAG_PREDEFINED, 9 | SUDOKU_FLAG_PREDEFINED, 0, 0, 0, 6 | SUDOKU_FLAG_PREDEFINED },
+					{ 0, 6 | SUDOKU_FLAG_PREDEFINED, 0, 0, 7 | SUDOKU_FLAG_PREDEFINED, 0, 1 | SUDOKU_FLAG_PREDEFINED, 0, 0 },
+					{ 3 | SUDOKU_FLAG_PREDEFINED, 0, 1 | SUDOKU_FLAG_PREDEFINED, 5 | SUDOKU_FLAG_PREDEFINED, 0, 0, 0, 7 | SUDOKU_FLAG_PREDEFINED, 2 | SUDOKU_FLAG_PREDEFINED },
+					{ 0, 9 | SUDOKU_FLAG_PREDEFINED, 0, 0, 4 | SUDOKU_FLAG_PREDEFINED, 2 | SUDOKU_FLAG_PREDEFINED, 3 | SUDOKU_FLAG_PREDEFINED, 0, 8 | SUDOKU_FLAG_PREDEFINED },
+					{ 1 | SUDOKU_FLAG_PREDEFINED, 0, 8 | SUDOKU_FLAG_PREDEFINED, 6 | SUDOKU_FLAG_PREDEFINED, 0, 0, 0, 2 | SUDOKU_FLAG_PREDEFINED, 9 | SUDOKU_FLAG_PREDEFINED },
+					{ 0, 2 | SUDOKU_FLAG_PREDEFINED, 0, 0, 1 | SUDOKU_FLAG_PREDEFINED, 8 | SUDOKU_FLAG_PREDEFINED, 6 | SUDOKU_FLAG_PREDEFINED, 4 | SUDOKU_FLAG_PREDEFINED, 0 },
+					{ 6 | SUDOKU_FLAG_PREDEFINED, 0, 0, 3 | SUDOKU_FLAG_PREDEFINED, 0, 0, 0, 1 | SUDOKU_FLAG_PREDEFINED, 0 } };
+#else
 u8 sudoku[9][9] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 					{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 					{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -48,7 +83,7 @@ u8 sudoku[9][9] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 					{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 					{ 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 					{ 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
-//
+#endif
 
 u8 check(u8 x, u8 y, u8 n)
 {
@@ -124,7 +159,7 @@ void set()
 		e->n = sudoku[y][x];
 		e->next = undo_ptr;
 		undo_ptr = e;
-		sudoku[y][x] = n;
+		sudoku[y][x] = n | SUDOKU_FLAG_MODIFIED;
 		// clear redo stack
 		struct placement *buf;
 		while (redo_ptr)
@@ -199,7 +234,9 @@ u8 interpret(char *seq)
 	switch(seq[0])
 	{
 	case 'h':
-		printf("-- Actions --\ns[e[t[*]]]: Set a number at a given position\nu[n[d[o]]]: Undo last action\nr[e[d[o]]]: Redo last action\ne[x[i[t]]]: Exit the program\n");
+		printf("-- Actions --\ns[e[t[*[*]]]]: Set a number at a given position\nu[n[d[o[*]]]]: Undo last action\nred[o[*]]: Redo last action\nres[e[t]]: Reset current sudoku\ne[x[i[t[*]]]]: Exit the program\n");
+		getchar();
+		getchar();
 		break;
 	case 's':
 		set();
@@ -214,10 +251,10 @@ u8 interpret(char *seq)
 		return FALSE;
 	default:
 		printf("Couldnt interpret sequence, type h[e[l[p]]] for more info.\n");
+		getchar();
+		getchar();
 		break;
 	}
-    getchar();
-    getchar();
 	return TRUE;
 }
 
@@ -233,7 +270,7 @@ void init(u32 filled)
 			if (((u32)rand() % 100) < filled)
 			{
 				while (!check(x, y, r = ((u8)rand() % 9) + 1));
-				sudoku[y][x] = r | (1 << 7);
+				sudoku[y][x] = r | SUDOKU_FLAG_PREDEFINED;
 			}
 		}
 	}
@@ -245,20 +282,83 @@ u8 check_win()
 	{
 		for (u8 x = 0; x < 9; x++)
 		{
-			if (sudoku[y][x] == 0)
+			if (SUDOKU_READ(x, y) == 0)
 				return FALSE;
 		}
 	}
 	return TRUE;
 }
 
+void reset()
+{
+	for (u8 y = 0; y < 9; y++)
+	{
+		for (u8 x = 0; x < 9; x++)
+		{
+			if (!SUDOKU_IS_PREDEFINED(sudoku[y][x]))
+			{
+				sudoku[y][x] = 0;
+			}
+		}
+	}
+}
+
+u8 solve(u8 overwrite)
+{
+	// TODO
+	return FALSE;
+	/*
+	struct key keys[9][9];
+	for (u8 y = 0; y < 9; y++)
+	{
+		for (u8 x = 0; x < 9; x++)
+		{
+			keys[y][x] = struct key{0, 0, 0};
+		}
+	}
+	if (overwrite)
+		reset();
+	for (u8 y = 0; y < 9; y++)
+	{
+		for (u8 x = 0; x < 9; x++)
+		{
+			if (!SUDOKU_IS_PREDEFINED(sudoku[y][x]))
+			{
+				for (u8 i = 1; i < 10; i++)
+				{
+					if (check(x, y, i))
+						keys[y][x].possible_solutions |= (1 << i);
+				}
+				if (keys[y][x].possible_solutions[y][x] == 0)
+					return FALSE;
+			}
+		}
+	}
+	for (u8 y = 0; y < 9; y++)
+	{
+		for (u8 x = 0; x < 9; x++)
+		{
+			for (; ; keys[y][x].current++)
+			{
+				// TODO
+				//keys[y][x].possible_solutions >>=
+			}
+		}
+	}
+	*/
+}
+
 int main(int argc, char **argv)
 {
 	char action[5];
+	#ifndef HARDCODE
 	init((argc == 2) ? atoi(argv[1]) : 50);
+	#endif
 	while (TRUE)
 	{
+		#ifndef DEBUG
         CONSOLE_CLEAR;
+		#endif
 		// Ausgabe des Spielfeldes
 		printf("  | 1 2 3 | 4 5 6 | 7 8 9 |\n--+-------+-------+-------+\n");
 		for (u8 y = 0; y < 9; y++)
@@ -266,13 +366,13 @@ int main(int argc, char **argv)
 			printf("%d ", y+1);
 			for (u8 x = 0; x < 9; x++)
 			{
-				printf((x % 3 == 0) ? "| %d " : "%d ", SUDOKU_READ(x, y));
+				printf((x % 3 == 0) ? "| %s%d%s " : "%s%d%s ", (SUDOKU_IS_MODIFIED(sudoku[y][x]) ? COLOR_MODIFIED : (SUDOKU_IS_PREDEFINED(sudoku[y][x]) ? COLOR_PREDEFINED : COLOR_WRITABLE)), SUDOKU_READ(x, y), COLOR_DEFAULT);
 			}
 			printf(((y+1) % 3 == 0) ? "|\n--+-------+-------+-------+\n" : "|\n");
 		}
 		// Abfrage von Aktion
 		printf("Action: ");
-		scanf("%4s", action);
+		scanf("%5s", action);
 		if (!interpret(action)) break;
 		if (check_win())
 		{
