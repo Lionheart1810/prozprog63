@@ -4,7 +4,7 @@
 
 /////////////////////////////////////////
 #define FUNKTION_TUTOR(x) x*x*x
-#define DEBUG 
+#define OUTPUT_PATH "C:\\Users\\Superleo1810\\Desktop\\test.bmp"
 #define COLOR_AXES 0xAAAAAA
 #define COLOR_GRAPH 0
 #define DIMENSIONS_X 1000
@@ -13,6 +13,8 @@
 #define WINDOW_MIN_Y -10.0f
 #define WINDOW_MAX_X 10.0f
 #define WINDOW_MAX_Y 10.0f
+#define INTERPOLATION
+#define DEBUG 
 /////////////////////////////////////////
 
 typedef signed long int s32;
@@ -34,6 +36,7 @@ typedef struct
 u32 *image;
 Vector2i dimensions;
 Vector2f window_min, window_max;
+char *output;
 
 // Helper functions, general context
 void toMath(Vector2i dimensions, Vector2f window_min, Vector2f window_max, Vector2i coords_bmp, Vector2f *coords_math);
@@ -66,12 +69,13 @@ void draw_point_math(Vector2f coords_math, u32 color)
 
 int main(int argc, char **argv)
 {
-	dimensions.x = (argc > 1) ? atoi(argv[1]) : DIMENSIONS_X;
-	dimensions.y = (argc > 2) ? atoi(argv[2]) : DIMENSIONS_Y;
-	window_min.x = (argc > 3) ? atof(argv[3]) : WINDOW_MIN_X;
-	window_min.y = (argc > 4) ? atof(argv[4]) : WINDOW_MIN_Y;
-	window_max.x = (argc > 5) ? atof(argv[5]) : WINDOW_MAX_X;
-	window_max.y = (argc > 6) ? atof(argv[6]) : WINDOW_MAX_Y;
+	output = (argc > 1) ? argv[1] : OUTPUT_PATH;
+	dimensions.x = (argc > 2) ? atoi(argv[2]) : DIMENSIONS_X;
+	dimensions.y = (argc > 3) ? atoi(argv[3]) : DIMENSIONS_Y;
+	window_min.x = (argc > 4) ? atof(argv[4]) : WINDOW_MIN_X;
+	window_min.y = (argc > 5) ? atof(argv[5]) : WINDOW_MIN_Y;
+	window_max.x = (argc > 6) ? atof(argv[6]) : WINDOW_MAX_X;
+	window_max.y = (argc > 7) ? atof(argv[7]) : WINDOW_MAX_Y;
 	image = malloc(dimensions.x * dimensions.y * sizeof(u32));
 	// Init
 	for (size_t i = 0, sz = dimensions.x * dimensions.y; i < sz; i++)
@@ -103,6 +107,7 @@ int main(int argc, char **argv)
 		{
 			image[(coords_bmp.y * dimensions.x) + coords_bmp.x] = COLOR_GRAPH;
 			// Interpolation
+			#ifdef INTERPOLATION
 			s32 diff = coords_bmp.y - coords_bmp_old.y;
 			if (diff < 0)
 			{
@@ -127,10 +132,11 @@ int main(int argc, char **argv)
 				}
 			}
 			memcpy(&coords_bmp_old, &coords_bmp, sizeof(Vector2i));
+			#endif
 		}
 		
 	}
-	bmp_create("C:\\Users\\Superleo1810\\Desktop\\test.bmp", image, dimensions.x, dimensions.y);
+	bmp_create(output, image, dimensions.x, dimensions.y);
 	free(image);
 	return 0;
 }
