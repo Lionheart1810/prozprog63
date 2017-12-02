@@ -17,6 +17,10 @@
 #define DEBUG 
 /////////////////////////////////////////
 
+#define TRUE 1
+#define FALSE 0
+
+typedef unsigned char u8;
 typedef signed long int s32;
 typedef unsigned long int u32;
 typedef unsigned long long u64;
@@ -83,6 +87,7 @@ int main(int argc, char **argv)
 	// Draw axes
 	Vector2f coords_math;
 	Vector2i coords_bmp, coords_bmp_old;
+	u8 modified = FALSE;
 	coords_bmp_old.x = 0;
 	coords_bmp_old.y = 0;
 	for (Vector2i x = { 0, 0 }; x.x < dimensions.x; x.x++)
@@ -108,30 +113,34 @@ int main(int argc, char **argv)
 			image[(coords_bmp.y * dimensions.x) + coords_bmp.x] = COLOR_GRAPH;
 			// Interpolation
 			#ifdef INTERPOLATION
-			s32 diff = coords_bmp.y - coords_bmp_old.y;
-			if (diff < 0)
+			if (modified)
 			{
-				for (s32 i = 0, k = diff / 2; i > k; i--)
+				s32 diff = coords_bmp.y - coords_bmp_old.y;
+				if (diff < 0)
 				{
-					image[((coords_bmp_old.y + i) * dimensions.x) + coords_bmp_old.x] = COLOR_GRAPH;
+					for (s32 i = 0, k = diff / 2; i > k; i--)
+					{
+						image[((coords_bmp_old.y + i) * dimensions.x) + coords_bmp_old.x] = COLOR_GRAPH;
+					}
+					for (s32 i = diff / 2; i > diff; i--)
+					{
+						image[((coords_bmp_old.y + i) * dimensions.x) + coords_bmp.x] = COLOR_GRAPH;
+					}
 				}
-				for (s32 i = diff / 2; i > diff; i--)
+				else
 				{
-					image[((coords_bmp_old.y + i) * dimensions.x) + coords_bmp.x] = COLOR_GRAPH;
-				}
-			}
-			else
-			{
-				for (s32 i = 0, k = diff / 2; i < k; i++)
-				{
-					image[((coords_bmp_old.y + i) * dimensions.x) + coords_bmp_old.x] = COLOR_GRAPH;
-				}
-				for (s32 i = diff / 2; i < diff; i++)
-				{
-					image[((coords_bmp_old.y + i) * dimensions.x) + coords_bmp.x] = COLOR_GRAPH;
+					for (s32 i = 0, k = diff / 2; i < k; i++)
+					{
+						image[((coords_bmp_old.y + i) * dimensions.x) + coords_bmp_old.x] = COLOR_GRAPH;
+					}
+					for (s32 i = diff / 2; i < diff; i++)
+					{
+						image[((coords_bmp_old.y + i) * dimensions.x) + coords_bmp.x] = COLOR_GRAPH;
+					}
 				}
 			}
 			memcpy(&coords_bmp_old, &coords_bmp, sizeof(Vector2i));
+			modified = TRUE;
 			#endif
 		}
 		
