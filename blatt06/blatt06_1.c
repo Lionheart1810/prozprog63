@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "libBMP.h"
+#include <math.h>
 
 /////////////////////////////////////////
-#define FUNKTION_TUTOR(x) x*x*x
+#define FUNKTION_TUTOR(x) tan(x)
 #define OUTPUT_PATH "C:\\Users\\Superleo1810\\Desktop\\test.bmp"
 #define COLOR_AXES 0xAAAAAA
 #define COLOR_GRAPH 0
@@ -142,6 +143,10 @@ int main(int argc, char **argv)
 			memcpy(&coords_bmp_old, &coords_bmp, sizeof(Vector2i));
 			modified = TRUE;
 			#endif
+		}
+		else
+		{
+			modified = FALSE;
 		}
 		
 	}
