@@ -1,29 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "sort.h"
+#include "blatt08_1.h"
 
-#define TRUE 1
-#define FALSE 0
-
-typedef unsigned char u8;
-typedef unsigned short u16;
-
-int main(int argc, char **argv);
-void array_size();
-void read_keys();
-void random_numbers();
-
-void (*funcs[5])(void) = { array_size, read_keys, random_numbers, bubblesort, mergesort };
+void (*funcs[5])() = { array_size, read_keys, random_numbers, bubblesort, mergesort };
 u16 *arr = NULL;
+size_t size = 0;
 
 void array_size()
 {
-	size_t sz = 0;
 	if (arr != NULL)
 		free(arr);
 	printf("Array size: ");
-	scanf("%u", &sz);
-	arr = malloc(sz * sizeof(u16));
+	scanf("%u", &size);
+	arr = (u16 *) malloc(size * sizeof(u16));
 }
 
 void read_keys()
@@ -31,16 +18,18 @@ void read_keys()
 	if (arr != NULL)
 	{
 		u16 n = 0;
-		for (size_t i = 0, sz = sizeof(arr)/sizeof(u16); i < sz; i++)
+		for (size_t i = 0; i < size; i++)
 		{
 			do
 			{
 				printf("arr[%d]: ", i);
 				scanf("%u", &n);
+				printf("%d\n", n);
 			}
 			while (n < 1 || n > 1000);
 			arr[i] = n;
 		}
+		print_array();
 	}
 }
 
@@ -49,22 +38,49 @@ void random_numbers()
 	if (arr != NULL)
 	{
 		srand(time(NULL));
-		for (size_t i = 0, sz = sizeof(arr)/sizeof(u16); i < sz; i++)
+		for (size_t i = 0; i < size; i++)
 		{
-			arr[i] = (u16)rand() % 1001;
+			arr[i] = ((u16)rand() % 1000) + 1;
 		}
+		print_array();
 	}
+}
+
+void bubblesort()
+{
+	if (arr == NULL)
+		printf("Array not defined yet!\n");
+	else
+		_bubblesort(arr, size);
+	print_array();
+}
+
+void mergesort()
+{
+	if (arr == NULL)
+		printf("Array not defined yet!\n");
+	else
+		_mergesort(arr, size);
+	print_array();
+}
+
+void print_array()
+{
+	for (size_t i = 0; i < size; i++)
+		printf("%d, ", arr[i]);
+	printf("\n");
 }
 
 int main(int argc, char **argv)
 {
 	int in = 0;
 	if (argc == 2)
-		in = atoi(argv[2][0]);
+		in = atoi(argv[1]);
 	do
 	{
-		do in = getchar()-48; while (in < 1 || in > 6);
-		funcs[in]();
+		do in = getchar()-'0'; while (in < 1 || in > 6);
+		if (in < 6)
+			(*funcs[in-1])();
 	}
 	while (in != 6);
 	return 0;

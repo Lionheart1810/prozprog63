@@ -1,10 +1,10 @@
 CC = gcc
 CFLAGS = -std=c99 -pedantic -Wall -Wextra
-BLATT08_1 = $(CC) $(CFLAGS) -o blatt08_1.exe blatt08_1.c
 
-all:
-	$(BLATT08_1)
-	blatt08_1.exe
-blatt08_1:
-	$(BLATT08_1)
-	blatt08_1.exe
+all: blatt08_1.exe
+blatt08_1.exe: blatt08_1.o sort.o
+	$(CC) $(CFLAGS) -o blatt08_1.exe blatt08_1.o sort.o
+sort.o: sort.c sort.h defs.h
+	$(CC) $(CFLAGS) -c sort.c
+blatt08_1.o: blatt08_1.c blatt08_1.h sort.h defs.h
+	$(CC) $(CFLAGS) -c blatt08_1.c
