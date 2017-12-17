@@ -1,6 +1,7 @@
 #ifndef SORT
 #define SORT
 
+#include <string.h>
 #include "defs.h"
 
 void swap(u16 *a, u16 *b);

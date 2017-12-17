@@ -17,17 +17,14 @@ void read_keys()
 {
 	if (arr != NULL)
 	{
-		u16 n = 0;
 		for (size_t i = 0; i < size; i++)
 		{
 			do
 			{
 				printf("arr[%d]: ", i);
-				scanf("%u", &n);
-				printf("%d\n", n);
+				scanf("%u", &arr[i]);
 			}
-			while (n < 1 || n > 1000);
-			arr[i] = n;
+			while (arr[i] < 1 || arr[i] > 1000);
 		}
 		print_array();
 	}
