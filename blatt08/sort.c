@@ -36,14 +36,12 @@ void _mergesort(u16 *arr, size_t size)
 		{
 			if (arr1 == end1)
 			{
-				for (; arr2 < end2; arr2++, arr++)
-					*arr = *arr2;
+				memcpy(arr, arr2, (end2 - arr2) * sizeof(u16));
 				break;
 			}
 			if (arr2 == end2)
 			{
-				for (; arr1 < end1; arr1++, arr++)
-					*arr = *arr1;
+				memcpy(arr, arr1, (end1 - arr1) * sizeof(u16));
 				break;
 			}
 			if (*arr1 < *arr2)
