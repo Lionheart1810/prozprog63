@@ -11,3 +11,17 @@ int main(int argc, char **argv) {
 		printf("%dK = %dC\n", i, i-273);
 	return 0;
 }
+
+//  int main(){
+  // for(int k = 0; k < 551; k = k + 5){
+    // int c = k - 273;
+    // if(k < 10){
+      // printf("  ");
+    // }else if(k < 100){
+      // printf(" ");
+    // }
+    // printf("kelvin: %d || celsius: %d \n", k,c);
+    // }
+  
+// }
+// 
