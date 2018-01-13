@@ -46,8 +46,6 @@ void buildlinkedlist(){
 		start->prev = NULL;
 		end = start;
 		m--;
-		// lastentry = (struct student*) malloc(sizeof(struct student));
-		// lastentry->next = startfix;
 	}
 	for(int i = 0; i < m; i++){
 		end->next = (struct student*) malloc(sizeof(struct student));
@@ -130,6 +128,42 @@ void autofill(){
 			lastentry->next->Pflichtkurse = 5;
 			lastentry = lastentry->next;
 		}
+		if(lastentry->next != NULL && startfix != NULL){
+			printf("copying...");
+			strcpy(lastentry->next->Vorname,"Linus");
+			strcpy(lastentry->next->Nachname,"Torvalds");
+			lastentry->next->Matrikelnummer = 145;
+			strcpy(lastentry->next->Adresse,"Kasernenstrasse 1222");
+			lastentry->next->Pflichtkurse = 42;
+			lastentry = lastentry->next;
+		}
+		if(lastentry->next != NULL && startfix != NULL){
+			printf("copying...");
+			strcpy(lastentry->next->Vorname,"Peter");
+			strcpy(lastentry->next->Nachname,"DeleteMe");
+			lastentry->next->Matrikelnummer = 9535;
+			strcpy(lastentry->next->Adresse,"Kasernenstrasse 122");
+			lastentry->next->Pflichtkurse = 7;
+			lastentry = lastentry->next;
+		}
+		if(lastentry->next != NULL && startfix != NULL){
+			printf("copying...");
+			strcpy(lastentry->next->Vorname,"Torben");
+			strcpy(lastentry->next->Nachname,"Maler");
+			lastentry->next->Matrikelnummer = 12345;
+			strcpy(lastentry->next->Adresse,"Kasernenstrasse 1222");
+			lastentry->next->Pflichtkurse = 97;
+			lastentry = lastentry->next;
+		}
+		if(lastentry->next != NULL && startfix != NULL){
+			printf("copying...");
+			strcpy(lastentry->next->Vorname,"Konrad");
+			strcpy(lastentry->next->Nachname,"Zuse");
+			lastentry->next->Matrikelnummer = 1234225;
+			strcpy(lastentry->next->Adresse,"Kasernenstrasse 12222");
+			lastentry->next->Pflichtkurse = 43;
+			lastentry = lastentry->next;
+		}
 	}
 }
 
@@ -152,8 +186,6 @@ void deleteentry(){
 	int i;
 	printf("Nummer:");
 	scanf("%d", &i);
-
-
 	delete = startfix;
 
 	for(int j = 1  ; j < i; j++){
@@ -187,7 +219,7 @@ void list_length(){
 	int i = 0;
 	int j = 0;
 	start = startfix;
-	if(start != NULL) i++;
+	if(start != NULL) i++, j++;
 	while(start->next != NULL){
 		if(strcmp(start->Vorname, "na")){
 			j++;
