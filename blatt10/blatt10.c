@@ -12,9 +12,6 @@ struct student{
 		struct student *prev;
 	};
 
-
-
-
 struct student *start;
 struct student *startfix;
 struct student *lastentry;
@@ -27,9 +24,7 @@ void swap(struct student **a, struct student **b){
     *b = temp;
 }
 
-
 void buildlinkedlist(){
-
 	int n , m;
 	printf("Anzahl : ");
 	scanf("%d", &n);
@@ -59,7 +54,6 @@ void buildlinkedlist(){
 }
 
 void getstudents(){
-
 	int n;
 	char buffer[20];
 	int bufferint;
@@ -95,7 +89,6 @@ void getstudents(){
 	}
 }
 
-
 // void getstudents(){
 	// FILE *fstudents = fopen( "students.txt", "r" );
 	// char *line = NULL;
@@ -110,8 +103,6 @@ void getstudents(){
 		// sscanf(read, "%s %s %d %s %d", &(start->Vorname), &(start->Nachname), &(start->Matrikelnummer), &(start->Adresse), &(start->Pflitchtkurse));
 		// start = start->next;
 	// }
-
-
 // }
 
 void autofill(){
