@@ -170,6 +170,7 @@ void print_student(){
 			}
 			start = start->next;
 		}while(start != NULL);
+		printf("\n");
 	}
 }
 
@@ -188,6 +189,80 @@ void deleteentry(){
 	free(delete);
 }
 
+void sort(){
+
+	int cp;
+    int n = 0;
+	start = startfix;
+	if(start != NULL) n++;
+	while(start->next != NULL){
+		n++;
+		start = start->next;
+	}
+    print_student();
+	for(int i = 0; i < n; i++){
+		struct student *pstart = startfix;
+		for(int j = 0; j < n-1; j++){
+            if(pstart->next != NULL){
+                cp = strcmp(pstart->Nachname, pstart->next->Nachname);
+                //getchar();
+                if(cp > 0){
+                    if(pstart->prev == NULL){
+                        struct student *pbuffer = pstart->next;
+                        struct student *pbuffer2 = pstart->next->next;
+                        struct student *pbuffer3 = pstart->prev;
+                        startfix = pbuffer;
+                        pstart->next = pbuffer2;
+                        pbuffer->next = pstart;
+
+                        pbuffer->prev = NULL;
+                        pstart->prev = pbuffer;
+                        pbuffer2->prev = pstart;
+
+                    }
+
+                    else if(pstart->next->next == NULL){
+                        struct student *pbuffer = pstart->next;
+                        struct student *pbuffer2 = pstart->next->next;
+                        //struct student *pbuffer3 = pstart->next->next->prev;
+                        struct student *pbuffer4 = pstart->prev;
+                        struct student *pbuffer5 = pstart->prev->next;
+                        pstart->next = NULL;
+                        pbuffer->next = pstart;
+                        pstart->prev->next == pbuffer;
+
+                        pstart->prev = pbuffer;
+                        //pbuffer2->prev = pstart;
+                        pbuffer->prev = pbuffer4;
+                    }
+                    else{
+                        struct student *pbuffer = pstart->next;
+                        struct student *pbuffer2 = pstart->next->next;
+                        struct student *pbuffer3 = pstart->next->next->prev;
+                        struct student *pbuffer4 = pstart->prev;
+                        struct student *pbuffer5 = pstart->prev->next;
+                        pstart->prev->next = pbuffer;
+                        pbuffer->next = pstart;
+                        pstart->next = pbuffer2;
+
+                        pbuffer->prev = pbuffer4;
+                        pstart->prev = pbuffer;
+                        pbuffer2->prev = pstart;
+                    }
+                    struct student *pbuffer3 = pstart;
+                    print_student();
+                    //getchar();
+                    pstart = pbuffer3;
+                }
+                else{
+                    pstart = pstart->next;
+                }
+            }
+		}
+	}
+	printf("Sortiert");
+}
+
 void changeorder(){
 	struct student *pbuffer;
 	end = startfix;
@@ -204,6 +279,7 @@ void changeorder(){
 	}
     swap(&startfix, &end);
 	lastentry = end;
+	end->next = NULL;
 }
 
 void list_length(){
@@ -221,7 +297,7 @@ void list_length(){
 	printf("Die doppelt verkettete Liste besteht aus %d Structs\nund hat %d Eintraege.", i, j);
 }
 
-void (*funcs[7])(void) = { buildlinkedlist, getstudents, autofill, print_student, list_length, deleteentry, changeorder };
+void (*funcs[8])(void) = { buildlinkedlist, getstudents, autofill, print_student, list_length, deleteentry, changeorder, sort };
 
 void freeall(){
 	delete = start = startfix;
@@ -234,20 +310,24 @@ void freeall(){
 
 int main(){
 	int in = 0;
+	getchar();
 	system("cls");
 	do
 	{
 		printf("1) Studenten anlegen	       2) Einlesen \n");
 		printf("3) Autofill                    4) Ausgeben \n");
 		printf("5) Listen Laenge               6) Eintrag loeschen\n");
-		printf("7) Reihenfolge aendern\n");
-		do in = getchar()-48; while (in < 1 || in > 7);
+		printf("7) Reihenfolge aendern         8) Alphabetisch sortieren\n");
+		do in = getchar()-48; while (in < 1 || in > 8);
 		funcs[in-1]();
 		getch();
 		system("cls");
 	}
-	while (in != 8);
+	while (in != 9);
 
 	freeall();
 	return(0);
 }
+
+
+
