@@ -179,7 +179,8 @@ void deleteentry(){
 	printf("Nummer:");
 	scanf("%d", &i);
 	delete = startfix;
-
+	printf("\n");
+	print_student();
 	for(int j = 1  ; j < i; j++){
 		delete = delete->next;
 	}
@@ -187,6 +188,7 @@ void deleteentry(){
 	delete->prev->next = delete->next;
 	delete->next->prev = delete->prev;
 	free(delete);
+	print_student();
 }
 
 void sort(){
@@ -229,11 +231,12 @@ void sort(){
                         struct student *pbuffer5 = pstart->prev->next;
                         pstart->next = NULL;
                         pbuffer->next = pstart;
-                        pstart->prev->next == pbuffer;
+                        pstart->prev->next = pbuffer;
 
                         pstart->prev = pbuffer;
                         //pbuffer2->prev = pstart;
                         pbuffer->prev = pbuffer4;
+						end = pstart;
                     }
                     else{
                         struct student *pbuffer = pstart->next;
@@ -264,6 +267,7 @@ void sort(){
 }
 
 void changeorder(){
+	print_student();
 	struct student *pbuffer;
 	end = startfix;
 	while(end->next != NULL){
@@ -280,6 +284,8 @@ void changeorder(){
     swap(&startfix, &end);
 	lastentry = end;
 	end->next = NULL;
+	print_student();
+	printf("startfix: %s    end: %s", startfix->Vorname, end->Vorname);
 }
 
 void list_length(){
